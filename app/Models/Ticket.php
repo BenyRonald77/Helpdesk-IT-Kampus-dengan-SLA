@@ -146,14 +146,22 @@ class Ticket extends Model
     }
 
     /**
-     * Status warna urgensi SLA: on_time (hijau, sisa >50%), approaching (kuning, sisa <=50%),
-     * breached (merah, sudah lewat sla_due_at). Warna di sini menandai urgensi SLA yang nyata
-     * (ambang waktu yang jelas), bukan dekorasi (antislop R-01 / R-31).
+     * Status warna urgensi SLA: on_time (hijau, sisa >50% atau selesai sebelum jatuh tempo),
+     * approaching (kuning, sisa <=50% dan masih berjalan), breached (merah, sudah lewat
+     * sla_due_at, baik masih terbuka maupun baru selesai setelah lewat tempo). Warna di sini
+     * menandai urgensi SLA yang nyata (ambang waktu yang jelas), bukan dekorasi
+     * (antislop R-01 / R-31).
      */
     public function slaColorStatus(?Carbon $now = null): ?string
     {
         if (! $this->sla_due_at) {
             return null;
+        }
+
+        // Tiket yang sudah selesai dinilai dari waktu penyelesaiannya, bukan dari waktu
+        // server sekarang (yang bisa jauh setelah tiket lama diselesaikan).
+        if ($this->resolved_at) {
+            return $this->resolved_at->greaterThan($this->sla_due_at) ? 'breached' : 'on_time';
         }
 
         if ($this->isOverdue($now)) {

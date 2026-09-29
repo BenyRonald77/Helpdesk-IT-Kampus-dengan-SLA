@@ -2,24 +2,24 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
-    use WithoutModelEvents;
-
     /**
-     * Seed the application's database.
+     * Seed the application's database dengan data master dan data demo.
+     *
+     * Catatan: tidak memakai WithoutModelEvents, karena TicketSeeder sengaja
+     * mengandalkan hook penghitungan sla_due_at pada model Ticket untuk sebagian
+     * kasus, dan mem-bypassnya secara eksplisit untuk data historis lainnya.
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        $this->call([
+            CategorySeeder::class,
+            SlaRuleSeeder::class,
+            TeamSeeder::class,
+            TicketSeeder::class,
         ]);
     }
 }
