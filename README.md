@@ -1,58 +1,93 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Helpdesk IT Kampus dengan SLA
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Aplikasi pelaporan gangguan IT internal kampus dengan target waktu penyelesaian (SLA) otomatis berdasarkan prioritas, eskalasi otomatis ke atasan tim saat tiket terlambat, dan laporan performa bulanan per teknisi/tim.
 
-## About Laravel
+Lihat `PRD.md` untuk latar belakang, aktor, dan kriteria penerimaan lengkap. Lihat `DESIGN.md` untuk arah desain dan alasan pemilihan warna.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Fitur
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- **Tiket berbasis prioritas dengan timer SLA otomatis**: target penyelesaian (`sla_due_at`) dihitung dan disimpan otomatis dari prioritas saat tiket dibuat, dan dihitung ulang bila prioritas diubah. Halaman detail tiket menghitung sisa waktu/keterlambatan langsung dari server setiap kali dimuat, dengan indikator warna hijau/kuning/merah sesuai ambang waktu nyata.
+- **Eskalasi otomatis ke supervisor**: perintah terjadwal `escalate:overdue-tickets` menemukan tiket yang lewat SLA dan belum ditangani, lalu mengeskalasinya ke supervisor tim terkait (fallback ke admin bila tim belum punya supervisor). Supervisor punya dashboard eskalasi untuk menugaskan ulang teknisi atau turun tangan langsung.
+- **Laporan performa bulanan**: rekap per teknisi dan per tim untuk bulan terpilih: jumlah tiket ditangani, rata-rata waktu resolusi, jumlah breach SLA, dan persentase tepat waktu, dihitung langsung dari data tiket (tidak ada angka rekaan).
+- **Alur tiket lengkap**: pelapor membuat & memantau tiket, teknisi mengambil dari antrian tim atau menangani tiket yang ditugaskan, komentar/riwayat pada setiap tiket, admin mengelola kategori, aturan SLA, tim, dan pengguna.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Peran pengguna
 
-## Learning Laravel
+| Peran | Bisa apa |
+|---|---|
+| **Pelapor** | Membuat tiket, melihat & mengomentari tiketnya sendiri |
+| **Teknisi** | Melihat tiket yang ditugaskan + antrian tim yang belum diambil, self-assign, mengubah status/prioritas, menandai selesai |
+| **Supervisor** | Melihat tiket timnya, dashboard tiket yang dieskalasi ke timnya, menugaskan ulang teknisi, melihat laporan performa timnya |
+| **Admin** | Semua di atas + mengelola kategori, aturan SLA, tim, pengguna, dan laporan seluruh tim |
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Kebutuhan
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- PHP 8.4, Composer 2.8
+- Node.js & npm
+- SQLite (bawaan untuk pengembangan/sandbox ini)
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+## Setup
 
 ```bash
-composer require laravel/boost --dev
+composer install
+cp .env.example .env
+php artisan key:generate
 
-php artisan boost:install
+touch database/database.sqlite
+php artisan migrate --seed
+
+npm install
+npm run build   # atau: npm run dev, untuk pengembangan dengan hot reload
+
+php artisan serve
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Buka `http://127.0.0.1:8000`.
 
-## Contributing
+### Menjalankan eskalasi otomatis
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Fitur eskalasi otomatis (`escalate:overdue-tickets`) sudah terdaftar di scheduler (`routes/console.php`, tiap 5 menit). Ini **tidak berjalan sendiri** kecuali salah satu dari berikut aktif:
 
-## Code of Conduct
+- **Pengembangan lokal**: jalankan `php artisan schedule:work` di terminal terpisah selama aplikasi dipakai.
+- **Produksi**: tambahkan satu entri cron yang memanggil `php artisan schedule:run` setiap menit:
+  ```
+  * * * * * cd /path/ke/aplikasi && php artisan schedule:run >> /dev/null 2>&1
+  ```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Untuk menjalankan eskalasi sekali secara manual (misalnya untuk memverifikasi): `php artisan escalate:overdue-tickets`.
 
-## Security Vulnerabilities
+### Database produksi (MySQL)
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Sandbox ini memakai SQLite. Untuk deployment sebenarnya, isi `.env` dengan blok MySQL yang sudah disediakan (dikomentari) di `.env.example`: ganti `DB_CONNECTION=sqlite` menjadi `DB_CONNECTION=mysql` dan isi `DB_HOST`/`DB_DATABASE`/`DB_USERNAME`/`DB_PASSWORD`, lalu jalankan `php artisan migrate --seed` seperti biasa.
 
-## License
+## Kredensial demo
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Semua pengguna demo memakai password: **`password`**
+
+| Peran | Email |
+|---|---|
+| Admin | `admin@helpdesk.test` |
+| Supervisor (Tim Jaringan & Infrastruktur) | `supervisor.jaringan@helpdesk.test` |
+| Supervisor (Tim Aplikasi & Software) | `supervisor.aplikasi@helpdesk.test` |
+| Teknisi (Tim Jaringan) | `teknisi.jaringan1@helpdesk.test`, `teknisi.jaringan2@helpdesk.test` |
+| Teknisi (Tim Aplikasi) | `teknisi.aplikasi1@helpdesk.test`, `teknisi.aplikasi2@helpdesk.test` |
+| Pelapor | `mahasiswa1@helpdesk.test`, `staf1@helpdesk.test`, `dosen1@helpdesk.test` |
+
+Data demo (`database/seeders/TicketSeeder.php`) sudah mencakup: tiket selesai tepat waktu, tiket selesai terlambat (breach), tiket masih terbuka dan sudah lewat SLA (belum dieskalasi, untuk mencoba perintah eskalasi manual), dan satu tiket yang sudah pernah dieskalasi.
+
+## Menjalankan pengujian
+
+```bash
+php artisan test
+```
+
+Cakupan pengujian meliputi: perhitungan `sla_due_at` dari prioritas saat tiket dibuat, perhitungan ulang saat prioritas diubah, perintah eskalasi (hanya mengeskalasi tiket yang benar-benar lewat SLA, dengan fallback ke admin bila tim belum punya supervisor), akurasi laporan performa bulanan terhadap data uji yang diketahui, tiket yang selesai terlambat tetap terhitung breach di laporan meski flag eskalasi tidak pernah diset, serta alur HTTP end-to-end (buat tiket, self-assign, resolve, dashboard eskalasi per tim) dan halaman-halaman utama untuk setiap peran memakai data demo yang sama.
+
+## Struktur teknis singkat
+
+- Laravel 13, autentikasi Breeze (stack Livewire) untuk login/registrasi/profil.
+- Peran pengguna lewat kolom `role` pada `users` + tabel `teams` (dengan `supervisor_id`) dan `team_id` pada teknisi.
+- Logika SLA: `App\Models\Ticket` (hook `creating`/`updating`), `App\Services\SlaCalculator`.
+- Eskalasi otomatis: `App\Console\Commands\EscalateOverdueTickets`, dijadwalkan di `routes/console.php`.
+- Laporan performa: `App\Services\TeamPerformanceReport`.
+- Otorisasi per tiket: `App\Policies\TicketPolicy`; otorisasi per halaman berbasis peran: middleware `role` (`App\Http\Middleware\EnsureUserHasRole`).

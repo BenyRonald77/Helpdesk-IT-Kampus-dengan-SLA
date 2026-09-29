@@ -1,21 +1,21 @@
-# DESIGN.md — Helpdesk IT Kampus dengan SLA
+# DESIGN.md: Helpdesk IT Kampus dengan SLA
 
 ## Apa ini
 
-Alat kerja internal untuk unit IT kampus: pelapor membuat tiket, teknisi menanganinya, supervisor mengawasi eskalasi timnya, admin mengatur data master. Ini bukan situs marketing dan tidak butuh meyakinkan siapa pun untuk "mendaftar" — setiap pengguna sudah punya akun dan tugas yang jelas begitu masuk. Desainnya melayani orang yang membuka aplikasi ini berkali-kali sehari di sela pekerjaan lain, bukan pengunjung sekali lihat.
+Alat kerja internal untuk unit IT kampus: pelapor membuat tiket, teknisi menanganinya, supervisor mengawasi eskalasi timnya, admin mengatur data master. Ini bukan situs marketing dan tidak butuh meyakinkan siapa pun untuk "mendaftar", setiap pengguna sudah punya akun dan tugas yang jelas begitu masuk. Desainnya melayani orang yang membuka aplikasi ini berkali-kali sehari di sela pekerjaan lain, bukan pengunjung sekali lihat.
 
 **Reading this as:** internal ticketing/admin tool untuk staf IT kampus, gaya minim-dekorasi ala perangkat kerja (bukan produk konsumen), dial `ENERGY 2 / RHYTHM 2 / MOTION 1`.
 
 ## Dial
 
-- **ENERGY 2** — setara Stripe/Vercel: bersih dan modern, tapi tidak sedatar GOV.UK juga tidak seramai landing page produk. Cocok untuk alat kerja harian: terasa dirawat, tidak menuntut perhatian.
-- **RHYTHM 2** — konsisten dengan beberapa variasi disengaja: halaman daftar tiket, halaman detail tiket, dan dashboard laporan punya bentuk berbeda karena tugasnya berbeda (memindai banyak baris vs membaca satu tiket vs membaca angka), bukan template yang diulang.
-- **MOTION 1** — hanya hover/focus state dan transisi halus bawaan Livewire (loading state saat submit). Tidak ada animasi hias; pengguna butuh kecepatan dan kepastian, bukan pertunjukan.
+- **ENERGY 2**: setara Stripe/Vercel, bersih dan modern, tapi tidak sedatar GOV.UK juga tidak seramai landing page produk. Cocok untuk alat kerja harian: terasa dirawat, tidak menuntut perhatian.
+- **RHYTHM 2**: konsisten dengan beberapa variasi disengaja. Halaman daftar tiket, halaman detail tiket, dan dashboard laporan punya bentuk berbeda karena tugasnya berbeda (memindai banyak baris vs membaca satu tiket vs membaca angka), bukan template yang diulang.
+- **MOTION 1**: hanya hover/focus state dan transisi halus bawaan Livewire (loading state saat submit). Tidak ada animasi hias; pengguna butuh kecepatan dan kepastian, bukan pertunjukan.
 
 ## Palet warna
 
 - **Netral** (tidak dihitung sebagai warna inti per R-29): skala `slate` Tailwind untuk teks, latar, dan border. Alasan: skala netral bawaan Tailwind sudah punya kontras yang teruji dan konsisten di seluruh komponen Breeze, tidak perlu diracik ulang.
-- **Aksen (1 warna): Indigo** (`indigo-600` di light mode, `indigo-400` di dark mode) — dipakai untuk tombol aksi utama, link aktif, dan ring fokus. Alasan: indigo netral secara emosional (tidak menyiratkan bahaya atau sukses seperti merah/hijau), sehingga tidak bertentangan secara visual dengan skema warna status SLA di bawah, dan cukup gelap untuk kontras AA di atas putih maupun di atas slate-900.
+- **Aksen (1 warna): Indigo** (`indigo-600` di light mode, `indigo-400` di dark mode), dipakai untuk tombol aksi utama, link aktif, dan ring fokus. Alasan: indigo netral secara emosional (tidak menyiratkan bahaya atau sukses seperti merah/hijau), sehingga tidak bertentangan secara visual dengan skema warna status SLA di bawah, dan cukup gelap untuk kontras AA di atas putih maupun di atas slate-900.
 
 ### Skema warna status SLA (fungsional, bukan dekoratif)
 
