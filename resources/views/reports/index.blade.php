@@ -7,7 +7,7 @@
         <div class="max-w-6xl mx-auto sm:px-6 lg:px-8 space-y-6">
             <x-flash-messages />
 
-            <form method="GET" action="{{ route('report.index') }}" class="flex items-end gap-3 rounded-lg border border-slate-200 bg-white p-4">
+            <form method="GET" action="{{ route('report.index') }}" class="flex flex-wrap items-end gap-3 rounded-lg border border-slate-200 bg-white p-4">
                 <div>
                     <x-input-label for="month" value="Bulan" class="text-xs" />
                     <select id="month" name="month" class="mt-1 rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm">

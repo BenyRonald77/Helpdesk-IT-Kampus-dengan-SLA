@@ -70,7 +70,7 @@
 
                     @if ($canManage)
                         <div class="flex flex-wrap items-end gap-4">
-                            <form method="POST" action="{{ route('tickets.update-status', $ticket) }}" class="flex items-end gap-2">
+                            <form method="POST" action="{{ route('tickets.update-status', $ticket) }}" class="flex flex-wrap items-end gap-2">
                                 @csrf
                                 @method('PATCH')
                                 <div>
@@ -86,7 +86,7 @@
                                 </button>
                             </form>
 
-                            <form method="POST" action="{{ route('tickets.update-priority', $ticket) }}" class="flex items-end gap-2">
+                            <form method="POST" action="{{ route('tickets.update-priority', $ticket) }}" class="flex flex-wrap items-end gap-2">
                                 @csrf
                                 @method('PATCH')
                                 <div>
@@ -106,7 +106,7 @@
                     @endif
 
                     @if ($canReassign)
-                        <form method="POST" action="{{ route('tickets.reassign', $ticket) }}" class="flex items-end gap-2">
+                        <form method="POST" action="{{ route('tickets.reassign', $ticket) }}" class="flex flex-wrap items-end gap-2">
                             @csrf
                             <div>
                                 <x-input-label for="assigned_to" value="Tugaskan ulang ke" class="text-xs" />

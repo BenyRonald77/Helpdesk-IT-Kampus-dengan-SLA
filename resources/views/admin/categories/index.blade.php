@@ -19,11 +19,11 @@
                 @else
                     <ul class="divide-y divide-slate-100">
                         @foreach ($categories as $category)
-                            <li class="flex items-center justify-between gap-4 px-6 py-3">
-                                <form method="POST" action="{{ route('admin.categories.update', $category) }}" class="flex flex-1 items-center gap-2">
+                            <li class="flex flex-wrap items-center justify-between gap-4 px-6 py-3">
+                                <form method="POST" action="{{ route('admin.categories.update', $category) }}" class="flex flex-1 flex-wrap items-center gap-2">
                                     @csrf
                                     @method('PATCH')
-                                    <input type="text" name="name" value="{{ $category->name }}" class="w-64 rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm">
+                                    <input type="text" name="name" value="{{ $category->name }}" class="w-full sm:w-64 rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm">
                                     <button type="submit" class="rounded-md border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                                         Simpan
                                     </button>
@@ -40,10 +40,10 @@
                     </ul>
                 @endif
 
-                <form method="POST" action="{{ route('admin.categories.store') }}" class="flex items-center gap-2 border-t border-slate-100 px-6 py-4">
+                <form method="POST" action="{{ route('admin.categories.store') }}" class="flex flex-wrap items-center gap-2 border-t border-slate-100 px-6 py-4">
                     @csrf
                     <input type="text" name="name" required placeholder="Nama kategori baru"
-                        class="w-64 rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm">
+                        class="w-full sm:w-64 rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm">
                     <button type="submit" class="rounded-md bg-indigo-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                         Tambah Kategori
                     </button>
