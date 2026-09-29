@@ -56,6 +56,10 @@ class Ticket extends Model
             if ($ticket->priority instanceof TicketPriority && ! $ticket->getAttribute('sla_due_at')) {
                 $ticket->sla_due_at = SlaCalculator::dueAt($ticket->priority, $ticket->created_at);
             }
+
+            if (! $ticket->isDirty('sla_breached') && $ticket->getAttribute('sla_breached') === null) {
+                $ticket->sla_breached = false;
+            }
         });
 
         static::updating(function (Ticket $ticket) {
@@ -175,6 +179,54 @@ class Ticket extends Model
         }
 
         return $fraction > 0.5 ? 'on_time' : 'approaching';
+    }
+
+    /**
+     * Label sisa waktu/keterlambatan yang bisa dibaca manusia, dihitung dari data
+     * server saat method ini dipanggil (bukan angka yang di-cache di browser).
+     */
+    public function remainingLabel(?Carbon $now = null): ?string
+    {
+        $minutes = $this->minutesUntilDue($now);
+
+        if ($minutes === null) {
+            return null;
+        }
+
+        $duration = $this->formatMinutes(abs($minutes));
+
+        if ($this->resolved_at) {
+            return $minutes < 0
+                ? "Selesai terlambat {$duration}"
+                : "Selesai {$duration} sebelum jatuh tempo";
+        }
+
+        return $minutes < 0
+            ? "Terlambat {$duration}"
+            : "Sisa {$duration}";
+    }
+
+    private function formatMinutes(int $minutes): string
+    {
+        $days = intdiv($minutes, 1440);
+        $hours = intdiv($minutes % 1440, 60);
+        $mins = $minutes % 60;
+
+        $parts = [];
+
+        if ($days > 0) {
+            $parts[] = "{$days} hari";
+        }
+
+        if ($hours > 0) {
+            $parts[] = "{$hours} jam";
+        }
+
+        if ($days === 0 && ($mins > 0 || empty($parts))) {
+            $parts[] = "{$mins} menit";
+        }
+
+        return implode(' ', $parts);
     }
 
     /**

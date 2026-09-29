@@ -33,6 +33,22 @@ new class extends Component
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" wire:navigate>
                         {{ __('Dashboard') }}
                     </x-nav-link>
+                    <x-nav-link :href="route('tickets.index')" :active="request()->routeIs('tickets.*')" wire:navigate>
+                        {{ __('Tiket') }}
+                    </x-nav-link>
+                    @if(auth()->user()->isSupervisor() || auth()->user()->isAdmin())
+                        <x-nav-link :href="route('escalations.index')" :active="request()->routeIs('escalations.*')" wire:navigate>
+                            {{ __('Eskalasi') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('report.index')" :active="request()->routeIs('report.*')" wire:navigate>
+                            {{ __('Laporan') }}
+                        </x-nav-link>
+                    @endif
+                    @if(auth()->user()->isAdmin())
+                        <x-nav-link :href="route('admin.categories.index')" :active="request()->routeIs('admin.*')" wire:navigate>
+                            {{ __('Kelola') }}
+                        </x-nav-link>
+                    @endif
                 </div>
             </div>
 
@@ -84,6 +100,22 @@ new class extends Component
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" wire:navigate>
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('tickets.index')" :active="request()->routeIs('tickets.*')" wire:navigate>
+                {{ __('Tiket') }}
+            </x-responsive-nav-link>
+            @if(auth()->user()->isSupervisor() || auth()->user()->isAdmin())
+                <x-responsive-nav-link :href="route('escalations.index')" :active="request()->routeIs('escalations.*')" wire:navigate>
+                    {{ __('Eskalasi') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('report.index')" :active="request()->routeIs('report.*')" wire:navigate>
+                    {{ __('Laporan') }}
+                </x-responsive-nav-link>
+            @endif
+            @if(auth()->user()->isAdmin())
+                <x-responsive-nav-link :href="route('admin.categories.index')" :active="request()->routeIs('admin.*')" wire:navigate>
+                    {{ __('Kelola') }}
+                </x-responsive-nav-link>
+            @endif
         </div>
 
         <!-- Responsive Settings Options -->
